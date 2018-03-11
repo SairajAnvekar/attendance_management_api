@@ -13,6 +13,8 @@ api.getAll = (User, Attendance, Token) => (req, res) => {
 
 api.getByEmp = (User, Attendance, Token) => (req, res) => {
   if (Token) {
+     console.log("req.query.emp_id");
+    console.log(req.query);
     Attendance.find({ emp_id: req.query.emp_id }, (error, Attendance) => {
       if (error) return res.status(400).json(error);
       res.status(200).json(Attendance);
@@ -36,5 +38,26 @@ api.store = (User, Attendance, Token) => (req, res) => {
     })
   } else return res.status(403).send({ success: false, message: 'Unauthorized' });
 }
+
+api.edit = (User, Attendance, Token) => (req, res) => {
+  if (Token) {  
+  const emp_id = req.query.emp_id;
+   Attendance.findOneAndUpdate({ emp_id: emp_id }, req.body, (error, attendance) => {
+          if (error) res.status(400).json(error);
+          res.status(200).json(attendance);
+        })   
+  } else return res.status(403).send({ success: false, message: 'Unauthorized' });
+}
+
+api.checkout = (User, Attendance, Token) => (req, res) => {
+  if (Token) {
+  const emp_id = req.body.emp_id;
+   Attendance.findOneAndUpdate({ emp_id: emp_id }, {out_time : Date.now()}, (error, attendance) => {
+          if (error) res.status(400).json(error);
+          res.status(200).json(attendance);
+        })   
+  } else return res.status(403).send({ success: false, message: 'Unauthorized' });
+}
+
 
 module.exports = api;

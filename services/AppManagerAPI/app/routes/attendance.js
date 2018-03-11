@@ -7,6 +7,10 @@ module.exports = (app) => {
   app.route('/api/v1/attendance')
      .post(passport.authenticate('jwt', config.session),api.store(models.User,models.Attendance,app.get('tokensecret')))
   app.route('/api/v1/attendance')
-     .get(passport.authenticate('jwt', config.session),  api.getAll(models.User,models.Attendance, app.get('tokensecret')));
-
+     .get(passport.authenticate('jwt', config.session), api.getAll(models.User,models.Attendance, app.get('tokensecret')))
+     .put(passport.authenticate('jwt', config.session), api.edit(models.User,models.Attendance, app.get('tokensecret')));
+  app.route('/api/v1/attendance/checkout')
+     .put(passport.authenticate('jwt', config.session), api.checkout(models.User,models.Attendance, app.get('tokensecret')));
+ app.route('/api/v1/attendance/employe')
+     .get(passport.authenticate('jwt', config.session), api.getByEmp(models.User,models.Attendance, app.get('tokensecret')))
 }
