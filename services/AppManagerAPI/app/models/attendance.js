@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const type = mongoose.Schema;
+var DateOnly = require('mongoose-dateonly')(mongoose);
 const Schema = mongoose.Schema({
   emp_id: {
     type: String,
@@ -7,7 +8,7 @@ const Schema = mongoose.Schema({
   },
 
   date: {
-    type: Date,
+    type: DateOnly,
     default: Date.now ,
     required: true
   },
