@@ -8,6 +8,8 @@ module.exports = (app) => {
      .post(api.setup(models.User))
   app.route('/api/v1/users')
      .get(passport.authenticate('jwt', config.session),  api.index(models.User, app.get('tokensecret')));
+  app.route('/api/v1/users/admin')
+      .get(passport.authenticate('jwt', config.session), api.getAll(models.User, app.get('tokensecret')))
   app.route('/api/v1/signup')
      .post(api.signup(models.User));
 }

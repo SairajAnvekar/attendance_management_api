@@ -40,5 +40,16 @@ api.signup = (User) => (req, res) => {
   }
 }
 
+api.getAll = (User, Token) => (req, res) => {
+  if (Token) {
+    User.find({}, (error, user) => {
+      if (error) return res.status(400).json(error);
+      res.status(200).json(user);
+      return true;
+    })
+  } else return res.status(403).send({ success: false, message: 'Unauthorized' });
+}
+
+
 
 module.exports = api;
