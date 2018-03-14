@@ -1,5 +1,5 @@
 module.exports = {
   secret: 'saikala',
   session: { session: false },
-  database: 'mongodb://localhost/inventoryManager'
+  database: process.env.MONGODB ||'mongodb://localhost/attendanceManager'
 }
