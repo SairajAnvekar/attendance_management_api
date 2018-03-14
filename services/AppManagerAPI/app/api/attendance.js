@@ -37,7 +37,7 @@ api.checkAttendance = (Attendance, Token) => (req, res) => {
 api.store = (User, Attendance, Token) => (req, res) => {
   if (Token) {
 
-    Attendance.find({ date : Date.now() }, (error, attendance) => {
+    Attendance.find({ date : Date.now() , emp_id : req.body.emp_id }, (error, attendance) => {
       if(attendance.length < 1){
         const attendance = new Attendance({
           emp_id: req.body.emp_id,
