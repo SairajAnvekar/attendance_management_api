@@ -11,6 +11,7 @@
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.1",
     "module-alias": "^2.0.3",
+    "moment": "^2.22.1",
     "mongoose": "^5.0.4",
     "mongoose-dateonly": "^1.0.4",
     "morgan": "^1.9.0",

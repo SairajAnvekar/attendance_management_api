@@ -6,7 +6,7 @@ const Schema = mongoose.Schema({
     type: String,
     required: true
   },
-
+  leave_status: String,
   date: {
     type: DateOnly,
     default: Date.now ,

@@ -12,10 +12,19 @@ api.getAll = (User, Attendance, Token) => (req, res) => {
 }
 
 api.getByEmp = (User, Attendance, Token) => (req, res) => {
-  if (Token) {
-     console.log("req.query.emp_id");
-    console.log(req.query);
-    Attendance.find({ emp_id: req.query.emp_id }, (error, Attendance) => {
+  if (Token) { 
+    let query={};
+    query={$lt: Date.now()}
+  
+    if (req.query.month){
+      const start = new Date(req.query.month);
+      const end =  new Date(req.query.month);
+      end.setMonth(end.getMonth()+1);   
+      console.log(start);
+      console.log(end);     
+      query={$gte:start,$lte:end}
+    }
+    Attendance.find({ emp_id: req.query.emp_id ,date:query}, (error, Attendance) => {
       if (error) return res.status(400).json(error);
       res.status(200).json(Attendance);
       return true;
@@ -36,8 +45,8 @@ api.checkAttendance = (Attendance, Token) => (req, res) => {
 
 api.store = (User, Attendance, Token) => (req, res) => {
   if (Token) {
-
-    Attendance.find({ date : Date.now() , emp_id : req.body.emp_id }, (error, attendance) => {
+    const date = req.body.date ?  req.body.date : Date.now();
+    Attendance.find({ date : date , emp_id : req.body.emp_id }, (error, attendance) => {
       if(attendance.length < 1){
         const attendance = new Attendance({
           emp_id: req.body.emp_id,

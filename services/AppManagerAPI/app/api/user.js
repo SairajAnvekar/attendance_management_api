@@ -29,15 +29,39 @@ api.signup = (User) => (req, res) => {
   else {
     const user = new User({
       username: req.body.username,
+      name: req.body.name,
       password: req.body.password,
-      emp_id: req.body.emp_id
+      emp_id: req.body.emp_id,
+      role: req.body.role,
+      tel_no: req.body.tel_no,
+      email: req.body.email,    
     });
-
+  
     user.save(error => {
       if (error) return res.status(400).json({ success: false, message: 'Username or Empoyle ID already exists.' });
       res.json({ success: true, message: 'Account created successfully' });
     });
   }
+}
+
+
+api.edit = (user) => (req, res) => {
+user.findById(req.body._id,(error, user) =>  { 
+   if (error) return res.status(400).json(error);
+   if (user) {
+    user.password = req.body.password ? req.body.password : user.password;
+    user.username = req.body.username ? req.body.username : user.username;
+    user.emp_id = req.body.emp_id ? req.body.emp_id : user.emp_id;
+    user.role = req.body.role ? req.body.role : user.role;
+    user.email = req.body.email ? req.body.email : user.email;
+    user.tel_no = req.body.tel_no ? req.body.tel_no : user.tel_no;
+   
+    user.save((error,test) => {
+      if (error) return res.status(400).json({ success: false, message: 'Username or Empoyle ID already exists.' });
+      res.json({ success: true, message: test });
+    });
+   }
+  });
 }
 
 api.getAll = (User, Token) => (req, res) => {
@@ -47,6 +71,21 @@ api.getAll = (User, Token) => (req, res) => {
       res.status(200).json(user);
       return true;
     })
+  } else return res.status(403).send({ success: false, message: 'Unauthorized' });
+}
+
+api.getByQuery = (User,Token) => (req, res) => {
+  if (Token) {  
+  const emp_id = req.query._id;
+  let query ={};
+  if (emp_id) {
+     query = { _id: emp_id };
+  }
+   User.find(query, (error, user) => {
+          if (error) res.status(400).json(error);
+          delete user.password;
+          res.status(200).json(user);
+        })   
   } else return res.status(403).send({ success: false, message: 'Unauthorized' });
 }
 

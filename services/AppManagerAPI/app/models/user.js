@@ -1,21 +1,48 @@
 const mongoose = require('mongoose'),
-      bcrypt = require('bcrypt');
+  bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema({
-    username: {
-        type: String,
-        unique: true,      
-        required: true
+  username: {
+    type: String,
+    unique: true,
+    required: true
+  },
+
+  name: String,
+  email: {
+    type: String,
+  },
+
+  tel_no: {
+    type: String,
+  },
+
+  password: {
+    type: String,
+    required: true
+  },
+  emp_id: {
+    type: String,
+    required: true
+  },
+  profpic: String,
+  position: String,
+  role: {
+    type: String,
+    enum: ['sadmin', 'manager', 'employe'],
+    default: 'employe',
+  },
+  leaves: {
+    privilege: {
+      type: Number,
+      default: 1.7
     },
-    password: {
-        type: String,
-        required: true
-    },
-    emp_id: {
-      type: String,     
-      required: true         
-    },
-    clients: [{}]
+    sick: {
+      type: Number,
+      default: 5
+    }
+  },
+  permission: [{}]
 });
 
 // We won't use arrow functions here because of automatic lexical scope binding
@@ -23,10 +50,10 @@ Schema.pre('save', function (next) {
   const user = this;
   if (this.isModified('password') || this.isNew) {
     bcrypt.genSalt(10, (error, salt) => {
-    if (error) return next(error);
-    bcrypt.hash(user.password, salt, (error, hash) => {
       if (error) return next(error);
-      user.password = hash;
+      bcrypt.hash(user.password, salt, (error, hash) => {
+        if (error) return next(error);
+        user.password = hash;
         next();
       });
     });
