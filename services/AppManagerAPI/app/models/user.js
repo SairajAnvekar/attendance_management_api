@@ -7,7 +7,6 @@ const Schema = mongoose.Schema({
     unique: true,
     required: true
   },
-
   name: String,
   email: {
     type: String,
@@ -29,13 +28,13 @@ const Schema = mongoose.Schema({
   position: String,
   role: {
     type: String,
-    enum: ['sadmin', 'manager', 'employe'],
+    enum: ['admin', 'manager', 'employe'],
     default: 'employe',
   },
   leaves: {
     privilege: {
       type: Number,
-      default: 1.7
+      default: 10
     },
     sick: {
       type: Number,

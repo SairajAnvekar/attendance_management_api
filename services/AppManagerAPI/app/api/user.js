@@ -38,7 +38,7 @@ api.signup = (User) => (req, res) => {
     });
   
     user.save(error => {
-      if (error) return res.status(400).json({ success: false, message: 'Username or Empoyle ID already exists.' });
+      if (error) return res.status(400).json({ success: false, message: error });
       res.json({ success: true, message: 'Account created successfully' });
     });
   }
@@ -55,6 +55,8 @@ user.findById(req.body._id,(error, user) =>  {
     user.role = req.body.role ? req.body.role : user.role;
     user.email = req.body.email ? req.body.email : user.email;
     user.tel_no = req.body.tel_no ? req.body.tel_no : user.tel_no;
+    user.leaves=req.body.leaves ? req.body.leaves: user.leaves;
+    user.name = req.body.name ? req.body.name : user.name;
    
     user.save((error,test) => {
       if (error) return res.status(400).json({ success: false, message: 'Username or Empoyle ID already exists.' });
@@ -81,7 +83,7 @@ api.getByQuery = (User,Token) => (req, res) => {
   if (emp_id) {
      query = { _id: emp_id };
   }
-   User.find(query, (error, user) => {
+   User.find(query,{ password: 0}, (error, user) => {
           if (error) res.status(400).json(error);
           delete user.password;
           res.status(200).json(user);

@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const type = mongoose.Schema;
 var DateOnly = require('mongoose-dateonly')(mongoose);
+const  ObjectId = mongoose.Schema.ObjectId;
 const Schema = mongoose.Schema({ 
     emp_id: {
-        type: String,           
+       type: ObjectId,        
     },    
     date: {
         type: DateOnly,
@@ -18,7 +19,7 @@ const Schema = mongoose.Schema({
        type:  Date
     },
     reason:String,
-    approveStatus:{type:Boolean,default:false}
+    approve_status:{type:Boolean,default:false}
 });
 
 mongoose.model('Regularize', Schema);

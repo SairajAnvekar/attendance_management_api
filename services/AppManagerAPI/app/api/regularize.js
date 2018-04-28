@@ -6,7 +6,27 @@ const mongoose = require('mongoose'),
 
 api.getAll = (Regularize, Token) => (req, res) => {
   if (Token) {
-    Regularize.find({}, (error, Regularize) => {
+
+    Regularize.aggregate([  {
+      $lookup: {
+        from: "users",
+        localField: "emp_id",
+        foreignField: "_id",
+        as: "user"
+      }},{
+      $unwind: "$user"
+    },
+      {
+      $project: {
+        "approve_status" : 1,
+        "checkin" :1,
+        "checkout" : 1,
+        "date" : 1,
+        "_id" :  1,
+        "username": "$user.username",
+        "emp_no": "$user.emp_id",
+        "email": "$user.email",
+      }}]).exec((error, Regularize) => {
       if (error) return res.status(400).json(error);
       res.status(200).json(Regularize);
       return true;

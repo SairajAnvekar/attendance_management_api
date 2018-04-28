@@ -12,7 +12,7 @@ const Schema = mongoose.Schema({
     type: DateOnly,   
   },
   desc: String,
-  approveStatus: {
+  approve_status: {
     type: Boolean,
     default: false
   },
