@@ -145,13 +145,16 @@ api.approve = (Leave, User, Attendance, Token) => (req, res) => {
       User.findOne({
         emp_id: req.body.emp_no
       }, (error, user) => {
-        if (user.leaves.privilege >= dates.length) {
+        const privilegeLeave = !!user.leaves.privilege >= dates.length;
+        const sickLeave = !!user.leaves.privilege == 0 && user.leaves.sick >= dates.length
+        console.log(privilegeLeave)
+        if (privilegeLeave || sickLeave) {
           async.eachSeries(dates, function updateObject(date, done) {
             // Model.update(condition, doc, callback)
             var add = {
               "emp_id": req.body.emp_no,
               'date': date,
-              'leave_status': 'leave'
+              'leave_status': 'leave',
             };
 
             if (date) {
@@ -169,7 +172,10 @@ api.approve = (Leave, User, Attendance, Token) => (req, res) => {
             }, {
               approve_status: true
             }, {}, (error, data) => {
-              user.leaves.privilege = user.leaves.privilege - dates.length
+              if (privilegeLeave)
+                user.leaves.privilege = user.leaves.privilege - dates.length
+              if (sickLeave)
+                user.leaves.sick = user.leaves.sick - dates.length
               user.save((error, user) => {
                 if (error) return res.status(400).json({
                   success: false,
@@ -195,41 +201,61 @@ api.approve = (Leave, User, Attendance, Token) => (req, res) => {
 
 api.save = (Leave, User, Token) => (req, res) => {
   if (Token) {
-
-    User.findOne({
-      _id: req.body.emp_id
-    }, (error, user) => {
-      console.log(user);
-      if (error) return res.status(400).json(error);
-      const leaves = moment(req.body.end_date).diff(moment(req.body.start_date), 'days') + 1;
-      if (user.leaves.privilege > leaves) {
-        const leave = new Leave({
-          emp_id: req.body.emp_id,
-          start_date: moment(req.body.startDate).format('MM/DD/YYYY'),
-          end_date: moment(req.body.endDate).format('MM/DD/YYYY'),
-          desc: req.body.desc
+    const start_date = moment(req.body.startDate).format('MM/DD/YYYY');
+    const end_date = moment(req.body.endDate).format('MM/DD/YYYY');
+    Leave.findOne({
+      start_date: start_date,
+      end_date: end_date,
+      emp_id: req.body.emp_id
+    }, (error, leave) => {
+      if (leave && leave._id) {
+        res.status(400).send({
+          success: false,
+          message: 'Leave is already applied'
         });
-
-        leave.save((error, leave) => {
+      } else {
+        User.findOne({
+          _id: req.body.emp_id
+        }, (error, user) => {
+          console.log(error);
+          console.log(user);
           if (error) return res.status(400).json(error);
-          const leaves_data = Object.assign({}, leave._doc, {
-            "username": user.username,
-            "emp_no": user.emp_id,
-            "email": user.email,
-            "role": user.role,
-            "user_id": user._id
+          const leaves = moment(req.body.end_date).diff(moment(req.body.start_date), 'days') + 1;
+          const privilegeLeave = !!user.leaves.privilege >= leaves;
+          const sickLeave = !!user.leaves.privilege == 0 && user.leaves.sick >= leaves
+          if (privilegeLeave || sickLeave) {
+            const leave = new Leave({
+              emp_id: req.body.emp_id,
+              start_date: start_date,
+              end_date: end_date,
+              desc: req.body.desc,
+              sick_leave: sickLeave,
+            });
+
+            leave.save((error, leave) => {
+              if (error) return res.status(400).json(error);
+              const leaves_data = Object.assign({}, leave._doc, {
+                "username": user.username,
+                "emp_no": user.emp_id,
+                "email": user.email,
+                "role": user.role,
+                "user_id": user._id
+              });
+
+              res.status(200).json({
+                success: true,
+                leave: leaves_data,
+
+              })
+            });
+          } else return res.status(403).send({
+            success: false,
+            message: 'Do dont have leaves in your account'
           });
-
-          res.status(200).json({
-            success: true,
-            leave: leaves_data,
-
-          })
         });
-      } else return res.status(403).send({
-        success: false,
-        message: 'Do dont have leaves in your account'
-      });
+
+      }
+
     });
   } else return res.status(403).send({
     success: false,

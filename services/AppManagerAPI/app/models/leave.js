@@ -17,6 +17,8 @@ const Schema = mongoose.Schema({
     default: false
   },
   half_day: Boolean,
+  sick_leave: Boolean,
+  
   numberOfDays: Number
 });
 
